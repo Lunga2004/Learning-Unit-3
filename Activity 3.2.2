@@ -1,0 +1,111 @@
+package clanship;
+ 
+/**
+*ST10445079
+* @author Kwinana
+*/
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+ 
+public class Clanship {
+    private static Map<Integer, MembershipOption> membershipOptions;
+    private static Scanner scanner;
+ 
+    static {
+        membershipOptions = new HashMap<>();
+        membershipOptions.put(1, new MembershipOption("Basic Membership", 10));
+        membershipOptions.put(2, new MembershipOption("Specials", 5));
+        membershipOptions.put(3, new MembershipOption("VIP Treatment", 20));
+        scanner = new Scanner(System.in);
+    }
+ 
+    public static void main(String[] args) {
+        MembershipOption membership = getMembershipSelection();
+        if (membership != null) {
+            MembershipOption[] extras = getExtraSelection();
+            double totalCost = calculateCost(membership, extras);
+            displayCost(totalCost);
+        }
+    }
+ 
+    private static MembershipOption getMembershipSelection() {
+        while (true) {
+            displayMenu();
+            int selection = getSelection();
+            if (selection == 0) {
+                return null;
+            } else if (membershipOptions.containsKey(selection)) {
+                return membershipOptions.get(selection);
+            } else {
+                System.out.println("Invalid selection. Please try again.");
+            }
+        }
+    }
+ 
+    private static MembershipOption[] getExtraSelection() {
+        MembershipOption[] extras = new MembershipOption[0];
+        while (true) {
+            displayMenu();
+            int selection = getSelection();
+            if (selection == 0) {
+                break;
+            } else if (membershipOptions.containsKey(selection)) {
+                extras = addExtra(extras, membershipOptions.get(selection));
+            } else {
+                System.out.println("Invalid selection. Please try again.");
+            }
+        }
+        return extras;
+    }
+ 
+    private static double calculateCost(MembershipOption membership, MembershipOption[] extras) {
+        double totalCost = membership.getPrice();
+        for (MembershipOption extra : extras) {
+            totalCost += extra.getPrice();
+        }
+        return totalCost;
+    }
+ 
+    private static void displayCost(double cost) {
+        System.out.printf("The total cost is: $%.2f%n", cost);
+    }
+ 
+    private static void displayMenu() {
+        System.out.println("Please choose an item from the menu:");
+        for (Map.Entry<Integer, MembershipOption> entry : membershipOptions.entrySet()) {
+            System.out.printf("%d. %s - $%.2f%n", entry.getKey(), entry.getValue().getName(), entry.getValue().getPrice());
+        }
+        System.out.println("0. Quit");
+    }
+ 
+    private static int getSelection() {
+        System.out.print("Enter your selection: ");
+        return scanner.nextInt();
+    }
+ 
+    private static MembershipOption[] addExtra(MembershipOption[] extras, MembershipOption extra) {
+        MembershipOption[] newExtras = new MembershipOption[extras.length + 1];
+        System.arraycopy(extras, 0, newExtras, 0, extras.length);
+        newExtras[extras.length] = extra;
+        return newExtras;
+    }
+ 
+    private static class MembershipOption {
+        private String name;
+        private double price;
+ 
+        public MembershipOption(String name, double price) {
+            this.name = name;
+            this.price = price;
+        }
+ 
+        public String getName() {
+            return name;
+        }
+ 
+        public double getPrice() {
+            return price;
+        }
+    }
+}
